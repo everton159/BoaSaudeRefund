@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BoaSaudeRefund;
 using BoaSaudeRefund.Data;
+using System.IO;
 
 namespace BoaSaudeRefund.Controllers
 {
@@ -30,7 +31,7 @@ namespace BoaSaudeRefund.Controllers
 
         // GET: api/Refunds/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Refund>> GetRefund(string id)
+        public async Task<ActionResult<Refund>> GetRefund(long id)
         {
             var refund = await _context.Refund.FindAsync(id);
 
@@ -45,7 +46,7 @@ namespace BoaSaudeRefund.Controllers
         // PUT: api/Refunds/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutRefund(string id, Refund refund)
+        public async Task<IActionResult> PutRefund(long id, Refund refund)
         {
             if (id != refund.Id)
             {
@@ -76,33 +77,70 @@ namespace BoaSaudeRefund.Controllers
         // POST: api/Refunds
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Refund>> PostRefund(Refund refund)
+        public async Task<ActionResult<Refund>> PostRefund([FromForm] RefundCreateModel refund)
         {
-            _context.Refund.Add(refund);
+
+            byte[] file;
+            using (var ms = new MemoryStream())
+            {
+                refund.File.CopyTo(ms);
+                file = ms.ToArray();
+                //string s = Convert.ToBase64String(fileBytes);
+                // act on the Base64 data
+            }
+            
+            var redundNew =_context.Refund.Add(
+                    new Refund
+                    {
+                        Reason = refund.Reason,
+                        Status = "Novo",
+                        CreatedAt = DateTime.Now,
+                        UpdatedAt = DateTime.Now,
+                        File = file
+                    }
+            );
             try
             {
-                await _context.SaveChangesAsync();
+              var newRefund = await _context.SaveChangesAsync();
             }
-            catch (DbUpdateException)
+            catch (Exception e)
             {
-                if (RefundExists(refund.Id))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest(e.Message);
             }
-
-            return CreatedAtAction("GetRefund", new { id = refund.Id }, refund);
+            return CreatedAtAction("GetRefund", new { id = redundNew.Entity.Id });
         }
 
         // DELETE: api/Refunds/5
-   
-        private bool RefundExists(string id)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteRefund(long id)
+        {
+            var refund = await _context.Refund.FindAsync(id);
+            if (refund == null)
+            {
+                return NotFound();
+            }
+            
+            _context.Refund.Remove(refund);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        private bool RefundExists(long id)
         {
             return _context.Refund.Any(e => e.Id == id);
         }
+
+
+
+
+        //public static async Task<byte[]> GetBytes(this IFormFile formFile)
+        //{
+        //    using (var memoryStream = new MemoryStream())
+        //    {
+        //        await formFile.CopyToAsync(memoryStream);
+        //        return memoryStream.ToArray();
+        //    }
+        //}
     }
 }
