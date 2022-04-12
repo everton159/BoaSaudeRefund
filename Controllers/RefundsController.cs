@@ -10,6 +10,7 @@ using BoaSaudeRefund.Data;
 using System.IO;
 using Microsoft.AspNetCore.Authorization;
 using BoaSaudeRefund.Infra;
+using Newtonsoft.Json;
 
 namespace BoaSaudeRefund.Controllers
 {
@@ -127,15 +128,20 @@ namespace BoaSaudeRefund.Controllers
             {
               var newRefund = await _context.SaveChangesAsync();
                 
-                _producer.SendMessage(new RefundMessage
-                {
-                    Id = redundNew.Entity.Id,
-                    Reason = redundNew.Entity.Reason,
-                    Status = redundNew.Entity.Status,
-                    CreatedAt = redundNew.Entity.CreatedAt,
-                    UpdatedAt = redundNew.Entity.UpdatedAt,
-                    File = redundNew.Entity.File
-                },"New-Refund");
+                _producer.SendMessage(
+
+                    JsonConvert.SerializeObject(
+                        new RefundMessage
+                        {
+                            Reason = refund.Reason,
+                            Status = "Novo",
+                            CreatedAt = DateTime.Now,
+                            UpdatedAt = DateTime.Now,
+                            File = file
+                        }
+                    )
+
+                    , "New-Refund");
                
             }
             catch (Exception e)
