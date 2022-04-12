@@ -62,9 +62,6 @@ namespace BoaSaudeRefund.Controllers
             return refunds;
         }
 
-        
-
-
         // PUT: api/Refunds/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}"),Authorize]
@@ -102,9 +99,6 @@ namespace BoaSaudeRefund.Controllers
         public async Task<ActionResult<Refund>> PostRefund([FromForm] RefundCreateModel refund)
         {
 
-
-
-            
             byte[] file;
             using (var ms = new MemoryStream())
             {
