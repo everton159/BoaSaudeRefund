@@ -1,17 +1,14 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using BoaSaudeRefund.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace BoaSaudeRefund
 {
@@ -28,6 +25,27 @@ namespace BoaSaudeRefund
         public void ConfigureServices(IServiceCollection services)
         {
 
+            services.AddAuthentication(opt => {
+                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+      .AddJwtBearer(options =>
+      {
+          options.TokenValidationParameters = new TokenValidationParameters
+          {
+              ValidateIssuer = false,
+              ValidateAudience =false,
+              ValidateLifetime = false,
+              ValidateIssuerSigningKey = false,
+              ValidIssuer = Configuration["Jwt:Issuer"],
+              ValidAudience = Configuration["Jwt:Audience"],
+              IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+          };
+      });
+
+
+
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -36,6 +54,7 @@ namespace BoaSaudeRefund
 
             services.AddDbContext<BoaSaudeRefundContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("BoaSaudeRefundContext")));
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,6 +69,7 @@ namespace BoaSaudeRefund
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

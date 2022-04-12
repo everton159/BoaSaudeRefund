@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using BoaSaudeRefund;
 using BoaSaudeRefund.Data;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
+using BoaSaudeRefund.Infra;
 
 namespace BoaSaudeRefund.Controllers
 {
@@ -16,23 +18,26 @@ namespace BoaSaudeRefund.Controllers
     public class RefundsController : ControllerBase
     {
         private readonly BoaSaudeRefundContext _context;
+        private readonly RabbitMQProducer _producer;
 
         public RefundsController(BoaSaudeRefundContext context)
         {
             _context = context;
+            _producer = new RabbitMQProducer();
         }
 
         // GET: api/Refunds
-        [HttpGet]
+        [HttpGet,Authorize]
         public async Task<ActionResult<IEnumerable<Refund>>> GetRefund()
         {
             return await _context.Refund.ToListAsync();
         }
 
-        // GET: api/Refunds/5
-        [HttpGet("{id}")]
+
+          [HttpGet("{id}"), Authorize]
         public async Task<ActionResult<Refund>> GetRefund(long id)
         {
+            //var refund = await _context.Refund.FindAsync(id);
             var refund = await _context.Refund.FindAsync(id);
 
             if (refund == null)
@@ -43,9 +48,25 @@ namespace BoaSaudeRefund.Controllers
             return refund;
         }
 
+        [HttpGet("user/{id}"), Authorize]
+        public async Task<ActionResult<IEnumerable<Refund>>> GetRefundByUser(string user)
+        {
+            var refunds = await _context.Refund.Where(r => r.User == user).ToListAsync();
+
+            if (refunds == null)
+            {
+                return NotFound();
+            }
+
+            return refunds;
+        }
+
+        
+
+
         // PUT: api/Refunds/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
+        [HttpPut("{id}"),Authorize]
         public async Task<IActionResult> PutRefund(long id, Refund refund)
         {
             if (id != refund.Id)
@@ -80,6 +101,9 @@ namespace BoaSaudeRefund.Controllers
         public async Task<ActionResult<Refund>> PostRefund([FromForm] RefundCreateModel refund)
         {
 
+
+
+            
             byte[] file;
             using (var ms = new MemoryStream())
             {
@@ -102,6 +126,17 @@ namespace BoaSaudeRefund.Controllers
             try
             {
               var newRefund = await _context.SaveChangesAsync();
+                
+                _producer.SendMessage(new RefundMessage
+                {
+                    Id = redundNew.Entity.Id,
+                    Reason = redundNew.Entity.Reason,
+                    Status = redundNew.Entity.Status,
+                    CreatedAt = redundNew.Entity.CreatedAt,
+                    UpdatedAt = redundNew.Entity.UpdatedAt,
+                    File = redundNew.Entity.File
+                },"New-Refund");
+               
             }
             catch (Exception e)
             {
@@ -132,15 +167,17 @@ namespace BoaSaudeRefund.Controllers
         }
 
 
+       
 
+    }
 
-        //public static async Task<byte[]> GetBytes(this IFormFile formFile)
-        //{
-        //    using (var memoryStream = new MemoryStream())
-        //    {
-        //        await formFile.CopyToAsync(memoryStream);
-        //        return memoryStream.ToArray();
-        //    }
-        //}
+    internal class RefundMessage
+    {
+        public long Id { get; set; }
+        public string Reason { get; set; }
+        public string Status { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+        public byte[] File { get; set; }
     }
 }

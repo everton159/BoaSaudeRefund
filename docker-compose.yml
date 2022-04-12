@@ -1,0 +1,39 @@
+version: '3.4'
+
+services:
+  boasauderefund:
+    image: ${DOCKER_REGISTRY-}boasauderefund
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "9001:80"
+    depends_on:
+      - sqldb
+      - migration_boasauderefund
+      - rabbitmq
+  sqldb:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - SA_PASSWORD=!Gisa@2022#
+      - ACCEPT_EULA=Y
+    ports:
+      - "1450:1434"
+    volumes:
+      - C:\gisa_refund\volumes\sqlserver:/var/opt/mssql/data
+    depends_on:
+      - migration_boasauderefund
+  migration_boasauderefund:
+    build:
+      context: .
+      dockerfile: Migrations.Dockerfile
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    hostname: 'rabbitmq'
+    ports:
+        - 5672:5672
+        - 15672:15672
+    volumes:
+        - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+        - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
