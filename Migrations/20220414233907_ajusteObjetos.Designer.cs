@@ -4,14 +4,16 @@ using BoaSaudeRefund.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BoaSaudeRefund.Migrations
 {
     [DbContext(typeof(BoaSaudeRefundContext))]
-    partial class BoaSaudeRefundContextModelSnapshot : ModelSnapshot
+    [Migration("20220414233907_ajusteObjetos")]
+    partial class ajusteObjetos
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

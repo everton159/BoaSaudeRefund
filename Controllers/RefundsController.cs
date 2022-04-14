@@ -35,7 +35,7 @@ namespace BoaSaudeRefund.Controllers
         }
 
 
-          [HttpGet("{id}"), Authorize]
+        [HttpGet("{id}"), Authorize]
         public async Task<ActionResult<Refund>> GetRefund(long id)
         {
             //var refund = await _context.Refund.FindAsync(id);
@@ -64,7 +64,8 @@ namespace BoaSaudeRefund.Controllers
 
         // PUT: api/Refunds/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}"),Authorize]
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Prestador")]
         public async Task<IActionResult> PutRefund(long id, Refund refund)
         {
             if (id != refund.Id)
@@ -90,12 +91,15 @@ namespace BoaSaudeRefund.Controllers
                 }
             }
 
-            return NoContent();
+
+            return Ok(refund);
         }
 
         // POST: api/Refunds
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        //
+        [Authorize(Roles = "Associdado")]
         public async Task<ActionResult<Refund>> PostRefund([FromForm] RefundCreateModel refund)
         {
 
@@ -147,6 +151,7 @@ namespace BoaSaudeRefund.Controllers
 
         // DELETE: api/Refunds/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteRefund(long id)
         {
             var refund = await _context.Refund.FindAsync(id);
@@ -165,10 +170,6 @@ namespace BoaSaudeRefund.Controllers
         {
             return _context.Refund.Any(e => e.Id == id);
         }
-
-
-       
-
     }
 
     internal class RefundMessage

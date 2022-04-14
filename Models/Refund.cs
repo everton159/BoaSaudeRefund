@@ -17,9 +17,19 @@ namespace BoaSaudeRefund
     {
         //Refund properties
         public Int64 Id { get; set; }
+       
         public string User { get; internal set; }
         public string Reason { get; set; }
+        public string Description { get; set; }
+
         public string Status { get; set; }
+
+        public double Price { get; set; }
+        
+        public string NFeNumber { get; set; }
+        
+        public DateTime Date { get; set; }
+
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
