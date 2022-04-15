@@ -39,7 +39,7 @@ namespace BoaSaudeRefund.Controllers
             if(user.Role == EnumUserRoles.Associado.ToString())
                 refunds = await _context.Refund.Where(r => r.UserId == user.Id).ToListAsync();
             else
-                refunds = await _context.Refund.ToListAsync();
+                refunds = await _context.Refund.Where(r => r.Status == EnumStateRefund.Novo).ToListAsync();
 
             if (refunds == null)
                 return NotFound();
