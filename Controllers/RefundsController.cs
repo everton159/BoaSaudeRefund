@@ -32,7 +32,7 @@ namespace BoaSaudeRefund.Controllers
         [HttpGet,Authorize]
         public async Task<ActionResult<IEnumerable<Refund>>> GetRefund()
         {
-            string token = HttpContext.Request.Headers.First(x => x.Key == "access_token").Value;
+            string token = HttpContext.Request.Headers.First(x => x.Key == "Authorization").Value;
             var handler = new JwtSecurityTokenHandler();
             var jwtSecurityToken = handler.ReadJwtToken(token);
             var role = jwtSecurityToken.Claims.First(c => c.Type.Contains("role")).Value;
