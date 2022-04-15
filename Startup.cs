@@ -44,6 +44,7 @@ namespace BoaSaudeRefund
                 };
             });
 
+            services.AddCors();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -84,11 +85,17 @@ namespace BoaSaudeRefund
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BoaSaudeRefund v1"));
             }
 
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("../swagger/v1/swagger.json", "BoaSaude MIC v1"));
+
             app.UseRouting();
+
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
 
             app.UseAuthentication();
             app.UseAuthorization();
