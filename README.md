@@ -3,7 +3,7 @@
   
   ![C2F553F0-3194-47E5-BF5C-88A70DF98619_4_5005_c](https://user-images.githubusercontent.com/19569999/162860920-04c561a5-5dd2-4b99-9400-bf5d7b083692.jpeg)
   
-  <h3 align="center">GISA Auth API</h3>
+  <h3 align="center">GISA MIC API</h3>
 </div>
 
 <!-- ABOUT THE PROJECT -->
