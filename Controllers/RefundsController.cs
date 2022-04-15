@@ -11,6 +11,7 @@ using System.IO;
 using Microsoft.AspNetCore.Authorization;
 using BoaSaudeRefund.Infra;
 using Newtonsoft.Json;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace BoaSaudeRefund.Controllers
 {
@@ -31,9 +32,21 @@ namespace BoaSaudeRefund.Controllers
         [HttpGet,Authorize]
         public async Task<ActionResult<IEnumerable<Refund>>> GetRefund()
         {
-            return await _context.Refund.ToListAsync();
+            string token = HttpContext.Request.Headers.First(x => x.Key == "access_token").Value;
+            var handler = new JwtSecurityTokenHandler();
+            var jwtSecurityToken = handler.ReadJwtToken(token);
+            var role = jwtSecurityToken.Claims.First(c => c.Type.Contains("role")).Value;
+            var user = jwtSecurityToken.Claims.First(c => c.Type.Contains("name")).Value;
+
+
+            if (role == "Prestador")
+                return await _context.Refund.ToListAsync();
+            else
+                return await _context.Refund.Where(x => x.User== user).ToListAsync();
         }
 
+
+        
 
         [HttpGet("{id}"), Authorize]
         public async Task<ActionResult<Refund>> GetRefund(long id)
@@ -99,7 +112,7 @@ namespace BoaSaudeRefund.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         //
-        [Authorize(Roles = "Associdado")]
+        [Authorize(Roles = "Associado")]
         public async Task<ActionResult<Refund>> PostRefund([FromForm] RefundCreateModel refund)
         {
 
