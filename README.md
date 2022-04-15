@@ -30,7 +30,7 @@ Faz-se necessário ter o [Docker](https://docs.docker.com/get-docker/) instalado
    ```sh
    cd .\repos\BoaSaudeRefund
    ```
-3. Insira a senha do banco de dados em `appsettings.json` na propriedade `DefaultConnection`
+3. Insira a senha do banco de dados em `appsettings.json` na propriedade `Password` em `DefaultConnection`
    ```json
    "DefaultConnection": "Initial Catalog=gisa-auth-db; Data Source=sqldb; Persist Security Info=True;User ID=SA;Password=PASSWORD_DATABASE;"
    ```
