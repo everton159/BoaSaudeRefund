@@ -30,10 +30,17 @@ namespace BoaSaudeRefund.Controllers
 
 
         [HttpGet]
-        [Authorize(Roles = "Prestador")]
+        [Authorize(Roles = "Associado,Prestador")]
         public async Task<ActionResult<IEnumerable<Refund>>> GetRefund()
         {
-            var refunds = await _context.Refund.ToListAsync();
+            IList<Refund> refunds;
+            var user = GetTokenUserInfo();
+
+            if(user.Role == EnumUserRoles.Associado.ToString())
+                refunds = await _context.Refund.Where(r => r.UserId == user.Id).ToListAsync();
+            else
+                refunds = await _context.Refund.ToListAsync();
+
             if (refunds == null)
                 return NotFound();
             else
@@ -51,7 +58,7 @@ namespace BoaSaudeRefund.Controllers
         }
 
         [HttpGet("user/{id}")]
-        [Authorize(Roles = "Associado")]
+        [Authorize(Roles = "Prestador")]
         public async Task<ActionResult<IEnumerable<Refund>>> GetRefundByUser(string id)
         {
             var refunds = await _context.Refund.Where(r => r.UserId == id).ToListAsync();
@@ -142,7 +149,7 @@ namespace BoaSaudeRefund.Controllers
             var role = jwtSecurityToken.Claims.First(c => c.Type.Contains("role")).Value;
             var user = jwtSecurityToken.Claims.First(c => c.Type.Contains("name")).Value;
 
-            return new TokenUserInfo { UserId = userId, UserName = user, Role = role };
+            return new TokenUserInfo { Id = userId, UserName = user, Role = role };
         }
 
         private Refund GenerateRefundByRefundCreateDto(RefundRegisterDto dto)
@@ -156,7 +163,7 @@ namespace BoaSaudeRefund.Controllers
                 NFeLink = dto.NFeLink,
                 Price = Double.Parse(dto.Price),
                 CNPJProvider = dto.CNPJProvider,
-                UserId = GetTokenUserInfo().UserId,
+                UserId = GetTokenUserInfo().Id,
                 CreatedAt = DateTime.Now,
                 Status = EnumStateRefund.Novo
             };
