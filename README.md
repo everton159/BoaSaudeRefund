@@ -14,7 +14,7 @@ API MIC com a funcionalidade de Reembolso para POC desenvolvida como parte da en
 * [JWT](https://jwt.io/introduction)
 * [Entity Framework](https://docs.microsoft.com/pt-br/ef/)
 * [Open API](https://swagger.io/specification/)
-* [Net 5](https://docs.microsoft.com/pt-br/dotnet/core/compatibility/5.0)
+* [.Net 5](https://docs.microsoft.com/pt-br/dotnet/core/compatibility/5.0)
 
 ## Iniciando
 
