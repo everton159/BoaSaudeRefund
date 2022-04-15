@@ -1,51 +1,63 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using BoaSaudeRefund.Enum;
 using System;
-using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations;
 
 namespace BoaSaudeRefund
 {
-
-    public class RefundCreateModel
-    {
-        //Refund properties
-        public string Reason { get; set; }
-        public IFormFile File { get; set; }
-
-    }
-
     public class Refund
     {
-        //Refund properties
         public Int64 Id { get; set; }
-       
-        public string User { get; internal set; }
-        public string Reason { get; set; }
+        public EnumStateRefund Type { get; set; }
         public string Description { get; set; }
-
-        public string Status { get; set; }
-
-        public double Price { get; set; }
-        
-        public string NFeNumber { get; set; }
-        
         public DateTime Date { get; set; }
-
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
-
+        public string NFeNumber { get; set; }
+        public string NFeLink { get; set; }
+        public double Price { get; set; }
+        public string CNPJProvider { get; set; }
+        public string UserId { get; set; }
         public byte[] File { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public EnumStateRefund Status { get; set; } = EnumStateRefund.Novo;
+        public string UserNameAnalyst { get; set; }
+        public DateTime? UpdatedAt { get; set; }
     }
-    
 
-    public class RefundDto
+
+    public class RefundRegisterDto
+    {
+        [Required]
+        public EnumStateRefund Type { get; set; }
+        [Required]
+        public string Price { get; set; }
+        [Required]
+        public string Date { get; set; }
+        [Required]
+        public string NFeNumber { get; set; }
+        [Required]
+        public string NFeLink { get; set; }
+        [Required]
+        public string CNPJProvider { get; set; }
+        [Required]
+        public string Description { get; set; }
+    }
+
+    public class RefundEditDto
+    {
+        public Int64 Id { get; set; }
+        [Required]
+        public EnumStateRefund Status { get; set; }
+    }
+
+    public class RefundMessage
     {
         public long Id { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
-        public string Reason { get; set; }
+        public string User { get; internal set; }
+        public DateTime Date { get; set; }
+        public double Price { get; set; }
+        public string NFeNumber { get; set; }
+        public string NFeLink { get; set; }
         public string Status { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
-
-
 
 }
