@@ -15,7 +15,7 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace BoaSaudeRefund.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("refund")]
     [ApiController]
     public class RefundsController : ControllerBase
     {
@@ -33,6 +33,7 @@ namespace BoaSaudeRefund.Controllers
         public async Task<ActionResult<IEnumerable<Refund>>> GetRefund()
         {
             string token = HttpContext.Request.Headers.First(x => x.Key == "Authorization").Value;
+            token = token.Replace("Bearer ", "");
             var handler = new JwtSecurityTokenHandler();
             var jwtSecurityToken = handler.ReadJwtToken(token);
             var role = jwtSecurityToken.Claims.First(c => c.Type.Contains("role")).Value;
