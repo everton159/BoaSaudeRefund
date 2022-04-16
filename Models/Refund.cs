@@ -15,6 +15,7 @@ namespace BoaSaudeRefund
         public double Price { get; set; }
         public string CNPJProvider { get; set; }
         public string UserId { get; set; }
+        public string UserName { get; set; }
         public byte[] File { get; set; }
         public DateTime CreatedAt { get; set; }
         public EnumStateRefund Status { get; set; } = EnumStateRefund.Novo;

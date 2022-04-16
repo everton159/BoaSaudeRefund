@@ -37,9 +37,9 @@ namespace BoaSaudeRefund.Controllers
             var user = GetTokenUserInfo();
 
             if(user.Role == EnumUserRoles.Associado.ToString())
-                refunds = await _context.Refund.Where(r => r.UserId == user.Id).OrderBy(r => r.CreatedAt).ToListAsync();
+                refunds = await _context.Refund.Where(r => r.UserId == user.Id).OrderByDescending(r => r.Date).ToListAsync();
             else
-                refunds = await _context.Refund.Where(r => r.Status == EnumStateRefund.Novo).OrderBy(r => r.CreatedAt).ToListAsync();
+                refunds = await _context.Refund.Where(r => r.Status == EnumStateRefund.Novo).OrderByDescending(r => r.Date).ToListAsync();
 
             if (refunds == null)
                 return NotFound();
@@ -154,6 +154,7 @@ namespace BoaSaudeRefund.Controllers
 
         private Refund GenerateRefundByRefundCreateDto(RefundRegisterDto dto)
         {
+            var user = GetTokenUserInfo();
             var refund = new Refund
             {
                 Type = dto.Type,
@@ -163,7 +164,8 @@ namespace BoaSaudeRefund.Controllers
                 NFeLink = dto.NFeLink,
                 Price = Double.Parse(dto.Price),
                 CNPJProvider = dto.CNPJProvider,
-                UserId = GetTokenUserInfo().Id,
+                UserId = user.Id,
+                UserName = user.UserName,
                 CreatedAt = DateTime.Now,
                 Status = EnumStateRefund.Novo
             };
